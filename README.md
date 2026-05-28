@@ -1,0 +1,2 @@
+# Circuit-Simulation-Simply-Application
+基于智能体编写的能够构建简易电路并得正确数据的仿真微信小程序

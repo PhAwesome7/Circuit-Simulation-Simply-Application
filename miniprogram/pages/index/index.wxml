@@ -1,0 +1,447 @@
+<view class="page-container">
+  <!-- 顶部导航栏 -->
+  <view class="top-bar">
+    <view class="title">电路模拟器</view>
+    <view class="circuit-status {{circuitStatus}}">
+      {{circuitStatusText}}
+    </view>
+  </view>
+  
+  <!-- 主工作区 -->
+  <view class="main-workspace">
+    <!-- 左侧工作区 -->
+    <view class="workspace-container">
+      <view class="workspace-header">
+        <view class="header-left">
+          <text class="section-title">工作区</text>
+          <text class="connection-hint" wx:if="{{connectingMode}}">
+            已选择 {{selectedTerminal.componentId}} 的端点{{selectedTerminal.terminal}}，请点击另一个端点
+          </text>
+        </view>
+        <view class="header-right">
+          <button class="btn" bindtap="startSimulation">开始模拟</button>
+          <button class="btn" bindtap="clearAll">清空工作区</button>
+        </view>
+      </view>
+      
+      <!-- 工作区网格 -->
+      <view 
+        class="workspace" 
+        id="workspace"
+        bindtouchstart="onWorkspaceTouchStart"
+      >
+        <!-- 网格背景 -->
+        <view class="grid-background"></view>
+        
+        <!-- 工作区中的元器件 -->
+        <block wx:for="{{components}}" wx:key="id">
+          <view 
+            class="component {{item.type}} {{item.selected ? 'selected' : ''}} {{item.status}}"
+            style="left: {{item.x}}px; top: {{item.y}}px; transform: rotate({{item.rotate}}deg); z-index: {{item.zIndex}};"
+            bindtouchstart="onComponentTouchStart"
+            bindtouchmove="onComponentTouchMove"
+            bindtouchend="onComponentTouchEnd"
+            data-id="{{item.id}}"
+          >
+            <!-- 元器件图标 -->
+            <view class="component-icon">
+              <!-- 电阻 -->
+              <block wx:if="{{item.type === 'resistor'}}">
+                <view class="resistor-shape">
+                  <view 
+                    class="terminal left {{getTerminalClass(item, 1)}}" 
+                    bindtap="onTerminalTap"
+                    data-id="{{item.id}}"
+                    data-terminal="1"
+                  ></view>
+                  <view class="resistor-body">
+                    <view class="resistor-line"></view>
+                    <view class="resistor-line"></view>
+                    <view class="resistor-line"></view>
+                  </view>
+                  <view 
+                    class="terminal right {{getTerminalClass(item, 2)}}" 
+                    bindtap="onTerminalTap"
+                    data-id="{{item.id}}"
+                    data-terminal="2"
+                  ></view>
+                </view>
+              </block>
+              
+              <!-- 电池 -->
+              <block wx:elif="{{item.type === 'battery'}}">
+                <view class="battery-shape">
+                  <view 
+                    class="terminal top {{getTerminalClass(item, 1)}}" 
+                    bindtap="onTerminalTap"
+                    data-id="{{item.id}}"
+                    data-terminal="1"
+                  ></view>
+                  <view class="battery-body">
+                    <view class="battery-positive">+</view>
+                    <view class="battery-negative">-</view>
+                  </view>
+                  <view 
+                    class="terminal bottom {{getTerminalClass(item, 2)}}" 
+                    bindtap="onTerminalTap"
+                    data-id="{{item.id}}"
+                    data-terminal="2"
+                  ></view>
+                </view>
+              </block>
+              
+              <!-- 开关 -->
+              <block wx:elif="{{item.type === 'switch'}}">
+                <view class="switch-shape {{item.state === 'closed' ? 'closed' : ''}}">
+                  <view 
+                    class="terminal left {{getTerminalClass(item, 1)}}" 
+                    bindtap="onTerminalTap"
+                    data-id="{{item.id}}"
+                    data-terminal="1"
+                  ></view>
+                  <view class="switch-body">
+                    <view class="switch-base"></view>
+                    <view class="switch-lever"></view>
+                  </view>
+                  <view 
+                    class="terminal right {{getTerminalClass(item, 2)}}" 
+                    bindtap="onTerminalTap"
+                    data-id="{{item.id}}"
+                    data-terminal="2"
+                  ></view>
+                </view>
+              </block>
+              
+              <!-- 灯泡 -->
+              <block wx:elif="{{item.type === 'bulb'}}">
+                <view class="bulb-shape {{item.status === 'on' ? 'on' : ''}}">
+                  <view 
+                    class="terminal top {{getTerminalClass(item, 1)}}" 
+                    bindtap="onTerminalTap"
+                    data-id="{{item.id}}"
+                    data-terminal="1"
+                  ></view>
+                  <view class="bulb-glass">
+                    <view class="filament {{item.status === 'on' ? 'glow' : ''}}"></view>
+                  </view>
+                  <view 
+                    class="terminal bottom {{getTerminalClass(item, 2)}}" 
+                    bindtap="onTerminalTap"
+                    data-id="{{item.id}}"
+                    data-terminal="2"
+                  ></view>
+                </view>
+              </block>
+              
+              <!-- 电机 -->
+              <block wx:elif="{{item.type === 'motor'}}">
+                <view class="motor-shape {{item.status === 'running' ? 'running' : ''}}">
+                  <view 
+                    class="terminal left {{getTerminalClass(item, 1)}}" 
+                    bindtap="onTerminalTap"
+                    data-id="{{item.id}}"
+                    data-terminal="1"
+                  ></view>
+                  <view class="motor-body">
+                    <view class="motor-shaft"></view>
+                  </view>
+                  <view 
+                    class="terminal right {{getTerminalClass(item, 2)}}" 
+                    bindtap="onTerminalTap"
+                    data-id="{{item.id}}"
+                    data-terminal="2"
+                  ></view>
+                </view>
+              </block>
+            </view>
+            
+            <!-- 元器件标签 -->
+            <view class="component-label">{{item.label}}</view>
+          </view>
+        </block>
+        
+        <!-- 导线 -->
+        <block wx:for="{{wires}}" wx:key="id">
+          <view 
+            class="wire {{item.status === 'connected' ? 'connected' : ''}}"
+            style="left: {{item.start.x}}px; top: {{item.start.y}}px; width: {{item.length}}px; transform: rotate({{item.angle}}rad);"
+            bindtap="onWireTap"
+            data-id="{{item.id}}"
+          >
+            <view class="wire-label" wx:if="{{item.current !== undefined}}">
+              {{item.currentDisplay}}A
+            </view>
+          </view>
+        </block>
+      </view>
+    </view>
+    
+    <!-- 右侧信息面板 -->
+    <view class="info-panel">
+      <view class="panel-header">
+        <text class="panel-title">电路信息</text>
+        <button class="btn small" bindtap="togglePanel">{{panelCollapsed ? '展开' : '收起'}}</button>
+      </view>
+      
+      <view class="panel-content" wx:if="{{!panelCollapsed}}">
+        <!-- 全局电路信息 -->
+        <view class="info-section" wx:if="{{!selectedComponent}}">
+          <view class="section-title">电路概览</view>
+          <view class="info-grid">
+            <view class="info-item">
+              <text class="info-label">电路状态</text>
+              <text class="info-value {{circuitStatus}}">{{circuitStatusText}}</text>
+            </view>
+            <view class="info-item" wx:if="{{circuitSummary.totalVoltage !== undefined}}">
+              <text class="info-label">总电压</text>
+              <text class="info-value">{{circuitSummary.totalVoltageDisplay}} V</text>
+            </view>
+            <view class="info-item" wx:if="{{circuitSummary.totalCurrent !== undefined}}">
+              <text class="info-label">总电流</text>
+              <text class="info-value">{{circuitSummary.totalCurrentDisplay}} A</text>
+            </view>
+            <view class="info-item" wx:if="{{circuitSummary.totalResistance !== undefined}}">
+              <text class="info-label">总电阻</text>
+              <text class="info-value">{{circuitSummary.totalResistanceDisplay}} Ω</text>
+            </view>
+            <view class="info-item" wx:if="{{circuitSummary.totalPower !== undefined}}">
+              <text class="info-label">总功率</text>
+              <text class="info-value">{{circuitSummary.totalPowerDisplay}} W</text>
+            </view>
+          </view>
+          
+          <!-- 元器件列表 -->
+          <view class="info-section">
+            <view class="section-title">元器件状态</view>
+            <scroll-view class="component-list" scroll-y>
+              <block wx:for="{{components}}" wx:key="id">
+                <view 
+                  class="component-item {{item.selected ? 'selected' : ''}}"
+                  bindtap="selectComponent"
+                  data-id="{{item.id}}"
+                >
+                  <view class="component-icon-small {{item.type}}"></view>
+                  <view class="component-info">
+                    <text class="component-name">{{item.label}}</text>
+                    <view class="component-stats">
+                      <text wx:if="{{item.voltage !== undefined}}">电压: {{item.voltageDisplay}}V</text>
+                      <text wx:if="{{item.current !== undefined}}"> 电流: {{item.currentDisplay}}A</text>
+                      <text wx:if="{{item.power !== undefined}}"> 功率: {{item.powerDisplay}}W</text>
+                    </view>
+                  </view>
+                </view>
+              </block>
+            </scroll-view>
+          </view>
+        </view>
+        
+        <!-- 选中元器件信息 -->
+        <view class="info-section" wx:if="{{selectedComponent}}">
+          <view class="section-title">
+            {{getComponentChineseName(selectedComponent.type)}}详情
+            <button class="btn close-btn" bindtap="clearSelection">×</button>
+          </view>
+          
+          <!-- 基本参数 -->
+          <view class="info-grid">
+            <view class="info-item">
+              <text class="info-label">标识</text>
+              <text class="info-value">{{selectedComponent.label}}</text>
+            </view>
+            <view class="info-item" wx:if="{{selectedComponent.voltage !== undefined}}">
+              <text class="info-label">电压</text>
+              <text class="info-value">{{selectedComponent.voltageDisplay}} V</text>
+            </view>
+            <view class="info-item" wx:if="{{selectedComponent.current !== undefined}}">
+              <text class="info-label">电流</text>
+              <text class="info-value">{{selectedComponent.currentDisplay}} A</text>
+            </view>
+            <view class="info-item" wx:if="{{selectedComponent.power !== undefined}}">
+              <text class="info-label">功率</text>
+              <text class="info-value {{selectedComponent.power > selectedComponent.ratedPower ? 'warning' : ''}}">
+                {{selectedComponent.powerDisplay}} W
+                <text wx:if="{{selectedComponent.power > selectedComponent.ratedPower}}">(过载!)</text>
+              </text>
+            </view>
+          </view>
+          
+          <!-- 参数调节 -->
+          <view class="param-section">
+            <!-- 电阻参数 -->
+            <view class="param-group" wx:if="{{selectedComponent.type === 'resistor'}}">
+              <view class="param-label">电阻值: {{selectedComponent.resistance}} Ω</view>
+              <slider 
+                min="1" 
+                max="1000" 
+                value="{{selectedComponent.resistance}}" 
+                show-value
+                bindchange="onResistanceChange"
+              />
+              <view class="param-presets">
+                <button class="btn preset" bindtap="setResistance" data-value="10">10Ω</button>
+                <button class="btn preset" bindtap="setResistance" data-value="100">100Ω</button>
+                <button class="btn preset" bindtap="setResistance" data-value="1000">1kΩ</button>
+              </view>
+            </view>
+            
+            <!-- 电池参数 -->
+            <view class="param-group" wx:if="{{selectedComponent.type === 'battery'}}">
+              <view class="param-label">电压: {{selectedComponent.voltageValue}} V</view>
+              <slider 
+                min="1.5" 
+                max="12" 
+                step="0.5"
+                value="{{selectedComponent.voltageValue}}" 
+                show-value
+                bindchange="onBatteryVoltageChange"
+              />
+              <view class="param-label" style="margin-top: 10px;">内阻: {{selectedComponent.internalResistance}} Ω</view>
+              <slider 
+                min="0" 
+                max="5" 
+                step="0.1"
+                value="{{selectedComponent.internalResistance}}" 
+                show-value
+                bindchange="onBatteryInternalResistanceChange"
+              />
+              <view class="param-presets">
+                <button class="btn preset" bindtap="setBattery" data-voltage="1.5">1.5V</button>
+                <button class="btn preset" bindtap="setBattery" data-voltage="3">3V</button>
+                <button class="btn preset" bindtap="setBattery" data-voltage="9">9V</button>
+              </view>
+            </view>
+            
+            <!-- 灯泡参数 -->
+            <view class="param-group" wx:if="{{selectedComponent.type === 'bulb'}}">
+              <view class="param-label">灯丝电阻: {{selectedComponent.bulbResistance}} Ω</view>
+              <slider 
+                min="1" 
+                max="100" 
+                value="{{selectedComponent.bulbResistance}}" 
+                show-value
+                bindchange="onBulbResistanceChange"
+              />
+              <view class="param-label" style="margin-top: 10px;">额定功率: {{selectedComponent.ratedPower}} W</view>
+              <slider 
+                min="0.1" 
+                max="10" 
+                step="0.1"
+                value="{{selectedComponent.ratedPower}}" 
+                show-value
+                bindchange="onBulbPowerChange"
+              />
+            </view>
+            
+            <!-- 电机参数 -->
+            <view class="param-group" wx:if="{{selectedComponent.type === 'motor'}}">
+              <view class="param-label">线圈电阻: {{selectedComponent.motorResistance}} Ω</view>
+              <slider 
+                min="1" 
+                max="50" 
+                value="{{selectedComponent.motorResistance}}" 
+                show-value
+                bindchange="onMotorResistanceChange"
+              />
+              <view class="param-label" style="margin-top: 10px;">额定功率: {{selectedComponent.ratedPower}} W</view>
+              <slider 
+                min="0.1" 
+                max="10" 
+                step="0.1"
+                value="{{selectedComponent.ratedPower}}" 
+                show-value
+                bindchange="onMotorPowerChange"
+              />
+            </view>
+            
+            <!-- 开关控制 -->
+            <view class="param-group" wx:if="{{selectedComponent.type === 'switch'}}">
+              <view class="param-label">开关状态: {{selectedComponent.state === 'open' ? '断开' : '闭合'}}</view>
+              <button 
+                class="btn toggle-switch {{selectedComponent.state === 'closed' ? 'active' : ''}}" 
+                bindtap="toggleSwitch"
+              >
+                {{selectedComponent.state === 'open' ? '点击闭合' : '点击断开'}}
+              </button>
+            </view>
+          </view>
+          
+          <!-- 控制按钮 -->
+          <view class="control-section">
+            <button class="btn control-btn" bindtap="rotateComponent">旋转元器件</button>
+            <button class="btn control-btn delete" bindtap="deleteComponent">删除元器件</button>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+  
+  <!-- 底部元器件库 -->
+  <view class="component-library">
+    <view class="library-header">
+      <text class="section-title">元器件库</text>
+      <text class="hint">点击添加元器件，长按查看说明</text>
+    </view>
+    
+    <view class="library-grid">
+      <view 
+        class="library-item resistor"
+        bindtap="addComponent"
+        bindlongpress="showComponentInfo"
+        data-type="resistor"
+      >
+        <view class="item-icon">
+          <view class="resistor-icon"></view>
+        </view>
+        <view class="item-label">电阻</view>
+      </view>
+      
+      <view 
+        class="library-item battery"
+        bindtap="addComponent"
+        bindlongpress="showComponentInfo"
+        data-type="battery"
+      >
+        <view class="item-icon">
+          <view class="battery-icon"></view>
+        </view>
+        <view class="item-label">电池</view>
+      </view>
+      
+      <view 
+        class="library-item switch"
+        bindtap="addComponent"
+        bindlongpress="showComponentInfo"
+        data-type="switch"
+      >
+        <view class="item-icon">
+          <view class="switch-icon"></view>
+        </view>
+        <view class="item-label">开关</view>
+      </view>
+      
+      <view 
+        class="library-item bulb"
+        bindtap="addComponent"
+        bindlongpress="showComponentInfo"
+        data-type="bulb"
+      >
+        <view class="item-icon">
+          <view class="bulb-icon"></view>
+        </view>
+        <view class="item-label">灯泡</view>
+      </view>
+      
+      <view 
+        class="library-item motor"
+        bindtap="addComponent"
+        bindlongpress="showComponentInfo"
+        data-type="motor"
+      >
+        <view class="item-icon">
+          <view class="motor-icon"></view>
+        </view>
+        <view class="item-label">电机</view>
+      </view>
+    </view>
+  </view>
+</view>

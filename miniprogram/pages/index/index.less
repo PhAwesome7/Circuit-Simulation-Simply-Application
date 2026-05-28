@@ -1,0 +1,1003 @@
+/* 页面容器 */
+.page-container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #f8f9fa;
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+/* 顶部导航栏 */
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 16px;
+  background: white;
+  border-bottom: 1px solid #e8e8e8;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  z-index: 100;
+}
+
+.title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+}
+
+.circuit-status {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.3s;
+}
+
+.circuit-status.open {
+  background: #ffccc7;
+  color: #d4380d;
+  border: 1px solid #ffa39e;
+}
+
+.circuit-status.closed {
+  background: #d9f7be;
+  color: #389e0d;
+  border: 1px solid #b7eb8f;
+}
+
+.circuit-status.short {
+  background: #fff1f0;
+  color: #cf1322;
+  border: 1px solid #ffa39e;
+}
+
+.circuit-status.complex {
+  background: #f0f5ff;
+  color: #1d39c4;
+  border: 1px solid #adc6ff;
+}
+
+.connection-hint {
+  font-size: 12px;
+  color: #666;
+  margin-left: 12px;
+  background: #f0f0f0;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+/* 主工作区布局 */
+.main-workspace {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+  padding: 10px;
+  gap: 10px;
+}
+
+/* 左侧工作区容器 */
+.workspace-container {
+  flex: 3;
+  display: flex;
+  flex-direction: column;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  overflow: hidden;
+}
+
+.workspace-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid #e8e8e8;
+  background: #fafafa;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.section-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+}
+
+.header-right {
+  display: flex;
+  gap: 8px;
+}
+
+.btn {
+  padding: 6px 12px;
+  font-size: 12px;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  background: white;
+  color: #333;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn:active {
+  background: #f0f0f0;
+  transform: scale(0.98);
+}
+
+.btn.small {
+  padding: 4px 8px;
+  font-size: 11px;
+}
+
+.btn.close-btn {
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border-radius: 50%;
+  font-size: 16px;
+  line-height: 1;
+}
+
+/* 工作区主体 */
+.workspace {
+  flex: 1;
+  position: relative;
+  background: #fafafa;
+  overflow: hidden;
+  touch-action: none;
+}
+
+/* 网格背景 */
+.grid-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    linear-gradient(90deg, #e8e8e8 1px, transparent 1px),
+    linear-gradient(#e8e8e8 1px, transparent 1px);
+  background-size: 20px 20px;
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+/* 元器件通用样式 */
+.component {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  background: white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  cursor: move;
+  user-select: none;
+  transition: all 0.2s;
+  touch-action: none;
+  z-index: 1;
+  padding: 4px;
+  box-sizing: border-box;
+}
+
+.component:active {
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  transform: scale(1.05) !important;
+  z-index: 1000;
+}
+
+.component.selected {
+  box-shadow: 0 0 0 2px #1890ff, 0 2px 8px rgba(0,0,0,0.2);
+  z-index: 1000;
+}
+
+/* 元器件尺寸 */
+.component.resistor,
+.component.switch {
+  width: 60px;
+  height: 30px;
+}
+
+.component.battery {
+  width: 40px;
+  height: 50px;
+}
+
+.component.bulb {
+  width: 50px;
+  height: 50px;
+}
+
+.component.motor {
+  width: 60px;
+  height: 40px;
+}
+
+/* 元器件边框颜色 */
+.component.resistor {
+  border: 2px solid #8b4513;
+}
+
+.component.battery {
+  border: 2px solid #f5222d;
+}
+
+.component.switch {
+  border: 2px solid #52c41a;
+}
+
+.component.bulb {
+  border: 2px solid #faad14;
+}
+
+.component.motor {
+  border: 2px solid #722ed1;
+}
+
+/* 元器件图标容器 */
+.component-icon {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+/* 电阻图标 */
+.resistor-shape {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 4px;
+}
+
+.resistor-body {
+  flex: 1;
+  height: 12px;
+  background: #8b4513;
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  margin: 0 4px;
+}
+
+.resistor-line {
+  width: 2px;
+  height: 16px;
+  background: #fff;
+}
+
+/* 电池图标 */
+.battery-shape {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 0;
+}
+
+.battery-body {
+  width: 20px;
+  height: 30px;
+  background: #f5222d;
+  border-radius: 2px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 10px;
+  font-weight: bold;
+  gap: 2px;
+}
+
+.battery-positive, .battery-negative {
+  font-size: 8px;
+}
+
+/* 开关图标 */
+.switch-shape {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 4px;
+}
+
+.switch-body {
+  position: relative;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.switch-base {
+  width: 16px;
+  height: 6px;
+  background: #52c41a;
+  border-radius: 3px;
+}
+
+.switch-lever {
+  position: absolute;
+  width: 2px;
+  height: 12px;
+  background: #389e0d;
+  bottom: 6px;
+  transition: transform 0.3s;
+  transform-origin: bottom;
+}
+
+.switch-shape.closed .switch-lever {
+  transform: rotate(30deg);
+}
+
+/* 灯泡图标 */
+.bulb-shape {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2px 0;
+}
+
+.bulb-glass {
+  width: 30px;
+  height: 30px;
+  border: 2px solid #faad14;
+  border-radius: 50%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.filament {
+  width: 2px;
+  height: 12px;
+  background: #d48806;
+  border-radius: 1px;
+  transition: all 0.3s;
+}
+
+.filament.glow {
+  background: #ffec3d;
+  box-shadow: 0 0 8px #ffec3d, 0 0 16px #ffec3d;
+  animation: flicker 0.5s infinite alternate;
+}
+
+@keyframes flicker {
+  0% { opacity: 1; }
+  100% { opacity: 0.8; }
+}
+
+/* 电机图标 */
+.motor-shape {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 4px;
+}
+
+.motor-body {
+  position: relative;
+  width: 30px;
+  height: 30px;
+  background: #722ed1;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.motor-shaft {
+  width: 2px;
+  height: 30px;
+  background: #391085;
+  transform-origin: center;
+  transition: transform 0.5s linear;
+}
+
+.motor-shape.running .motor-shaft {
+  animation: rotate 1s linear infinite;
+}
+
+@keyframes rotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* 端子样式 - 已调整 */
+.terminal {
+  width: 8px;
+  height: 8px;
+  background: #bfbfbf;
+  border-radius: 50%;
+  border: 2px solid white;
+  box-shadow: 0 0 2px rgba(0,0,0,0.3);
+  transition: all 0.2s;
+  z-index: 2;
+  cursor: pointer;
+  position: relative;
+}
+
+.terminal:hover {
+  transform: scale(1.2);
+}
+
+.terminal.selected {
+  background: #fa8c16;
+  box-shadow: 0 0 4px #fa8c16;
+}
+
+.terminal.connected {
+  background: #52c41a;
+  box-shadow: 0 0 4px #52c41a;
+}
+
+.terminal.left {
+  margin-right: 2px;
+}
+
+.terminal.right {
+  margin-left: 2px;
+}
+
+.terminal.top {
+  margin-bottom: 2px;
+}
+
+.terminal.bottom {
+  margin-top: 2px;
+}
+
+/* 元器件标签 */
+.component-label {
+  position: absolute;
+  bottom: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 10px;
+  color: #666;
+  white-space: nowrap;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 1px 4px;
+  border-radius: 2px;
+  z-index: 1;
+  pointer-events: none;
+  text-align: center;
+  max-width: 80px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 导线样式 */
+.wire {
+  position: absolute;
+  height: 2px;
+  background: #8c8c8c;
+  transform-origin: 0 0;
+  pointer-events: auto;
+  z-index: 0;
+  transition: all 0.3s;
+  cursor: pointer;
+}
+
+.wire.connected {
+  background: #f5222d;
+  box-shadow: 0 0 3px #f5222d;
+  animation: currentFlow 1s linear infinite;
+}
+
+@keyframes currentFlow {
+  0% { background-position: 0 0; }
+  100% { background-position: 20px 0; }
+}
+
+.wire-label {
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 9px;
+  color: #666;
+  background: white;
+  padding: 1px 3px;
+  border-radius: 2px;
+  white-space: nowrap;
+  pointer-events: none;
+  border: 1px solid #f0f0f0;
+}
+
+/* 右侧信息面板 */
+.info-panel {
+  flex: 1;
+  min-width: 300px;
+  max-width: 350px;
+  display: flex;
+  flex-direction: column;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  overflow: hidden;
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid #e8e8e8;
+  background: #fafafa;
+}
+
+.panel-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+}
+
+.panel-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+}
+
+/* 信息部分样式 */
+.info-section {
+  margin-bottom: 20px;
+}
+
+.info-section .section-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  font-size: 14px;
+  color: #333;
+  border-bottom: 1px solid #f0f0f0;
+  padding-bottom: 8px;
+}
+
+/* 信息网格 */
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px;
+  background: #fafafa;
+  border-radius: 4px;
+  border: 1px solid #f0f0f0;
+}
+
+.info-label {
+  font-size: 11px;
+  color: #999;
+  font-weight: 500;
+}
+
+.info-value {
+  font-size: 13px;
+  color: #333;
+  font-weight: 600;
+}
+
+.info-value.warning {
+  color: #f5222d;
+}
+
+/* 元器件列表 */
+.component-list {
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid #f0f0f0;
+  border-radius: 4px;
+}
+
+.component-item {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  border-bottom: 1px solid #f0f0f0;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.component-item:last-child {
+  border-bottom: none;
+}
+
+.component-item:hover {
+  background: #fafafa;
+}
+
+.component-item.selected {
+  background: #e6f7ff;
+  border-left: 3px solid #1890ff;
+}
+
+.component-icon-small {
+  width: 20px;
+  height: 20px;
+  margin-right: 8px;
+  border-radius: 2px;
+}
+
+.component-icon-small.resistor {
+  background: #8b4513;
+}
+
+.component-icon-small.battery {
+  background: #f5222d;
+}
+
+.component-icon-small.switch {
+  background: #52c41a;
+}
+
+.component-icon-small.bulb {
+  background: #faad14;
+}
+
+.component-icon-small.motor {
+  background: #722ed1;
+}
+
+.component-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.component-name {
+  font-size: 12px;
+  font-weight: 500;
+  color: #333;
+}
+
+.component-stats {
+  font-size: 10px;
+  color: #666;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+/* 参数调节区域 */
+.param-section {
+  margin-top: 16px;
+}
+
+.param-group {
+  margin-bottom: 16px;
+  padding: 12px;
+  background: #fafafa;
+  border-radius: 4px;
+  border: 1px solid #f0f0f0;
+}
+
+.param-label {
+  font-size: 12px;
+  color: #333;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.param-presets {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.preset {
+  padding: 4px 8px;
+  font-size: 11px;
+  background: #e6f7ff;
+  border-color: #91d5ff;
+  color: #096dd9;
+}
+
+.toggle-switch {
+  width: 100%;
+  padding: 8px;
+  background: #f0f0f0;
+  border: 1px solid #d9d9d9;
+  color: #333;
+}
+
+.toggle-switch.active {
+  background: #52c41a;
+  border-color: #389e0d;
+  color: white;
+}
+
+/* 控制区域 */
+.control-section {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.control-btn {
+  flex: 1;
+  padding: 8px 12px;
+  font-size: 12px;
+}
+
+.control-btn.delete {
+  background: #fff1f0;
+  border-color: #ffa39e;
+  color: #f5222d;
+}
+
+/* 滑动条样式 */
+slider {
+  width: 100%;
+  margin: 8px 0;
+}
+
+/* 底部元器件库 */
+.component-library {
+  background: white;
+  border-radius: 8px;
+  margin: 0 10px 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.library-header {
+  padding: 8px 16px;
+  border-bottom: 1px solid #e8e8e8;
+  background: #fafafa;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.hint {
+  font-size: 11px;
+  color: #999;
+}
+
+/* 元器件库网格 */
+.library-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  padding: 12px;
+}
+
+.library-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 8px;
+  border-radius: 6px;
+  border: 1px solid #f0f0f0;
+  cursor: pointer;
+  transition: all 0.2s;
+  user-select: none;
+  background: white;
+  min-height: 60px;
+  box-sizing: border-box;
+}
+
+.library-item:active {
+  transform: scale(0.95);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  border-color: #1890ff;
+  background: #f0f7ff;
+}
+
+.item-icon {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 6px;
+}
+
+.item-label {
+  font-size: 10px;
+  color: #666;
+  font-weight: 500;
+  text-align: center;
+  word-break: break-all;
+}
+
+/* 元器件库图标 */
+.resistor-icon {
+  width: 20px;
+  height: 8px;
+  background: #8b4513;
+  border-radius: 1px;
+  position: relative;
+}
+
+.resistor-icon::before,
+.resistor-icon::after {
+  content: '';
+  position: absolute;
+  width: 2px;
+  height: 12px;
+  background: #8b4513;
+  top: -2px;
+}
+
+.resistor-icon::before {
+  left: 4px;
+}
+
+.resistor-icon::after {
+  right: 4px;
+}
+
+.battery-icon {
+  width: 12px;
+  height: 20px;
+  background: #f5222d;
+  position: relative;
+  border-radius: 1px;
+}
+
+.battery-icon::before {
+  content: '+';
+  position: absolute;
+  top: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: white;
+  font-size: 8px;
+  font-weight: bold;
+}
+
+.battery-icon::after {
+  content: '-';
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: white;
+  font-size: 8px;
+  font-weight: bold;
+}
+
+.switch-icon {
+  width: 20px;
+  height: 12px;
+  background: #52c41a;
+  border-radius: 6px;
+  position: relative;
+}
+
+.switch-icon::before {
+  content: '';
+  position: absolute;
+  width: 2px;
+  height: 8px;
+  background: #389e0d;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.bulb-icon {
+  width: 16px;
+  height: 16px;
+  border: 2px solid #faad14;
+  border-radius: 50%;
+  position: relative;
+}
+
+.bulb-icon::before {
+  content: '';
+  position: absolute;
+  width: 8px;
+  height: 2px;
+  background: #faad14;
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.motor-icon {
+  width: 20px;
+  height: 20px;
+  background: #722ed1;
+  border-radius: 50%;
+  position: relative;
+}
+
+.motor-icon::before {
+  content: '';
+  position: absolute;
+  width: 2px;
+  height: 20px;
+  background: #391085;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* 滚动条样式 */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f0f0f0;
+  border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #bfbfbf;
+  border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #999;
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+  .main-workspace {
+    flex-direction: column;
+  }
+  
+  .info-panel {
+    max-width: 100%;
+    min-width: 0;
+  }
+  
+  .library-grid {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+
+/* 动画 */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.component, .wire {
+  animation: fadeIn 0.3s ease-out;
+}

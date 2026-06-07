@@ -311,5 +311,3 @@ data: {
 **对应完整代码文件：** index.json, index.less, index.ts, index.wxml, app.json
 
 ---
-
-再次为之前的失误向你道歉！现在这个版本是完整的，你可以直接全选复制，保存为 `.md` 文件使用。
